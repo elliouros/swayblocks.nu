@@ -1,3 +1,4 @@
+#!/usr/bin/env nu
 def remove [y: int]: int -> int {
   let x = $in
   let mod = $x mod $y
