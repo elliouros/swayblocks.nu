@@ -12,18 +12,15 @@ def get-stat [] {
     }
   ]
   | to json -r
-  | $'($in),'
 }
-{
-  version: 1,
-  click_events: true
-}
-| to json -r
+
+'{"version":1,"click_events":true}'
+| $"($in)\n["
 | print
-$'[(get-stat)' | print
-sleep 1sec
 loop {
-  get-stat | print
+  get-stat
+  | $'($in),'
+  | print
   sleep 1sec
 }
 

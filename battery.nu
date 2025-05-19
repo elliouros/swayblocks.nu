@@ -1,10 +1,12 @@
 #!/usr/bin/env nu
-const name_color = '#FFFF00'
+const name_color = 'color="#FFFF00"'
 const crit = 20
-const crit_color = '#FF0000'
-const chrg_color = '#00FF00'
+const color = 'color="#FFFFFF"'
+const chrg_color = 'color="#00FF00"'
+const crit_color = 'color="#FF0000" weight="bold"'
+
 def span []: string -> string {
-  $'<span foreground="($in)">'
+  $'<span ($in)>'
 }
 def color-from-bat []: record -> string {
   let bat = $in
@@ -12,10 +14,10 @@ def color-from-bat []: record -> string {
   let chrg = $bat.POWER_SUPPLY_STATUS == 'Charging'
   if $chrg {
     $chrg_color
-  } else if ($perc < $crit) {
+  } else if ($perc <= $crit) {
     $crit_color
   } else {
-    '#FFFFFF'
+    $color
   }
 }
 def bat-to-text [--no-name (-0)]: record -> string {
@@ -27,26 +29,24 @@ def bat-to-text [--no-name (-0)]: record -> string {
     $'($bat | color-from-bat | span)'
     $'($bat.POWER_SUPPLY_CAPACITY | into string)'
     '%</span>'
-  ] | str join ''
+  ] | str join
 }
-let batteries = (
-  glob '/sys/class/power_supply/*'
-  | each {||
-    $'($in)/uevent'
-    | open
-    | lines
-    | parse '{key}={value}'
-    | reduce -f {} {|it|
-      upsert $it.key $it.value
-    }
-  }
-  | where POWER_SUPPLY_TYPE == Battery
-)
 
-if (($batteries | length) == 1) {
-  $batteries | first | bat-to-text -0
+glob '/sys/class/power_supply/*'
+| each {||
+  $'($in)/uevent'
+  | open
+  | lines
+  | parse '{key}={value}'
+  | reduce -f {} {|it|
+    upsert $it.key $it.value
+  }
+}
+| where POWER_SUPPLY_TYPE == Battery
+| if (($in | length) == 1) {
+  $in | first | bat-to-text -0
 } else {
-  $batteries
+  $in
   | each {|| bat-to-text}
   | str join ' '
 }
