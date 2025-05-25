@@ -50,3 +50,4 @@ glob '/sys/class/power_supply/*'
   | each {|| bat-to-text}
   | str join ' '
 }
+| print
