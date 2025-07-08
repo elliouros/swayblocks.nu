@@ -59,12 +59,12 @@ def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
       | reduce -f {cache: $cache results: []} {|mod acc|
         let path = (
           [$mod.name $mod.instance?]
-          | filter {|x| $x != null}
+          | where {$in != null}
           | into cell-path
         )
         if ($clock mod $mod.interval == 0) {
           let output = (
-            run-external 'sh' '-c' $mod.command
+            run-external ...$mod.command
             | { name: $mod.name full_text: $in }
             | if ($mod.instance? != null) {insert instance $mod.instance} else {$in}
             | if ($mod.markup? != null) {insert markup $mod.markup} else {$in}

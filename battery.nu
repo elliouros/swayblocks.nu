@@ -5,9 +5,6 @@ const color = 'color="#FFFFFF"'
 const chrg_color = 'color="#00FF00"'
 const crit_color = 'color="#FF0000" weight="bold"'
 
-def span []: string -> string {
-  $'<span ($in)>'
-}
 def color-from-bat []: record -> string {
   let bat = $in
   let perc = $bat.POWER_SUPPLY_CAPACITY | into int
@@ -23,10 +20,10 @@ def color-from-bat []: record -> string {
 def bat-to-text [--no-name (-0)]: record -> string {
   let bat = $in
   [
-    $'($name_color | span)'
+    $'<span ($name_color)>'
     $'(if $no_name {'BAT'} else {$bat.POWER_SUPPLY_NAME})'
     '</span> '
-    $'($bat | color-from-bat | span)'
+    $'<span ($bat | color-from-bat)>'
     $'($bat.POWER_SUPPLY_CAPACITY | into string)'
     '%</span>'
   ] | str join
@@ -50,4 +47,3 @@ glob '/sys/class/power_supply/*'
   | each {|| bat-to-text}
   | str join ' '
 }
-| print
