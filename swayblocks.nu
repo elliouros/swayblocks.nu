@@ -46,7 +46,7 @@ def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
     | where {|v| ($v | describe) == 'int' and $v > 0 }
     | gcd-list
   )
-  let interval_dur = $interval | into duration -u sec
+  let interval_dur = $interval | into duration -u ms
   let max = $config.modules.interval | math max
 
   "{\"version\":1,\"click_events\":false}\n[" | print
