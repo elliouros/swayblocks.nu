@@ -51,6 +51,16 @@ def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
 
   "{\"version\":1,\"click_events\":false}\n[" | print
 
+  if ($config.debug? != null) {
+    sleep ($config.debug.sleep? | default 1000 | into duration -u ms);
+    # ^allow notificaiton daemon time to start
+    notify-send 'swayblocks.nu info' ([
+      $interval
+      $max
+      ($modules | to nuon)
+    ] | str join "\n")
+  }
+
   mut cache = {}
 
   loop { for clock in 0..$interval..($max - $interval) {
