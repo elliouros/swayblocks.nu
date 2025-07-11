@@ -64,6 +64,7 @@ def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
   mut cache = {}
 
   loop { for clock in 0..$interval..($max - $interval) {
+    let before = date now
     let result = (
       $modules
       | reduce -f {cache: $cache results: []} {|mod acc|
@@ -96,8 +97,10 @@ def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
     $cache = $result.cache
     $result.results
     | to json -r
-    | $'($in),'
+    | $in ++ ','
     | print
-    sleep $interval_dur
+    sleep ($before - (date now) + $interval_dur)
+    # makes more sense as interval - (date now - before) but this is more
+    # conscise because order of operations
   } }
 }
