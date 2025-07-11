@@ -1,32 +1,40 @@
 #!/usr/bin/env nu
 const name_color = 'color="#FFFF00"'
 const crit = 20
-const color = 'color="#FFFFFF"'
 const chrg_color = 'color="#00FF00"'
 const crit_color = 'color="#FF0000" weight="bold"'
 
 def color-from-bat []: record -> string {
-  let bat = $in
-  let perc = $bat.POWER_SUPPLY_CAPACITY | into int
-  let chrg = $bat.POWER_SUPPLY_STATUS == 'Charging'
-  if $chrg {
+  {
+    perc: ($in.POWER_SUPPLY_CAPACITY | into int)
+    chrg: ($in.POWER_SUPPLY_STATUS == 'Charging')
+  }
+  | if $in.chrg {
     $chrg_color
-  } else if ($perc <= $crit) {
+  } else if ($in.perc <= $crit) {
     $crit_color
   } else {
-    $color
+    null
   }
 }
 def bat-to-text [--no-name (-0)]: record -> string {
-  let bat = $in
-  [
+  {
+    name: (if $no_name {'BAT'} else {$in.POWER_SUPPLY_NAME})
+    color: ($in | color-from-bat)
+    perc: ($in.POWER_SUPPLY_CAPACITY ++ '%')
+  }
+  | [
     $'<span ($name_color)>'
-    $'(if $no_name {'BAT'} else {$bat.POWER_SUPPLY_NAME})'
+    ($in.name)
     '</span> '
-    $'<span ($bat | color-from-bat)>'
-    $'($bat.POWER_SUPPLY_CAPACITY | into string)'
-    '%</span>'
-  ] | str join
+    # hacky shit
+    ($in | if ($in.color != null) {
+      $'<span ($in.color)>($in.perc)</span>'
+    } else {
+      $in.perc
+    })
+  ]
+  | str join
 }
 
 glob '/sys/class/power_supply/*'
