@@ -32,7 +32,7 @@ def gcd-list []: list -> int {
 }
 
 def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
-  let config = $config | str replace -r '^~' $env.HOME
+  let config = $config | str replace -r '^~' $nu.home-path
   if (($config | path type) != 'file') {
     error make {
       msg: 'Could not find configuration file!'
@@ -65,8 +65,7 @@ def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
 
   loop { for clock in 0..$interval..($max - $interval) {
     let before = date now
-    let result = (
-      $modules
+    let result = $modules
       | reduce -f {cache: $cache results: []} {|mod acc|
         let path = (
           [$mod.name $mod.instance?]
@@ -93,7 +92,7 @@ def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
           }
         }
       }
-    )
+
     $cache = $result.cache
     $result.results
     | to json -r
