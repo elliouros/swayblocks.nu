@@ -1,0 +1,27 @@
+# debug:
+#   sleep: 500
+modules:
+  - name: focused
+    command: ["/home/ellie/.config/swayblocks/focused.nu"]
+    interval: 1000
+    # markup: pango # todo maybe add colors
+  - name: scratchpad
+    command: ["/home/ellie/.config/swayblocks/scratchpad.nu"]
+    interval: 2000
+    markup: pango
+  - name: battery
+    command: ["/home/ellie/.config/swayblocks/battery.nu"]
+    interval: 20000
+    markup: pango
+  - name: volume
+    command: ["/home/ellie/.config/swayblocks/volume.nu"]
+    interval: 1000
+    markup: pango
+  - name: backlight
+    command: ["/home/ellie/.config/swayblocks/backlight.nu"]
+    interval: 1000
+    markup: pango
+  - name: date
+    command: ["date", "+%T"]
+    # command: ["date", "+%T %Y-%m-%d"]
+    interval: 1000
