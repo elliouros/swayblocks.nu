@@ -24,8 +24,8 @@ swaymsg -t get_tree
     if ($in.nodes | is-empty) { # window (empty nodes)
       $in.name? | default '<unnamed>'
     } else { # container (has nodes)
-      $'($in.type)tainer ($in.nodes | length)' # hacky ass interpolation :sob:
+      $'($in.type)tainer ($in.nodes | length)' # hacky ass interpolation
     }
   },
-  _ => {$'unknown type ($in.type)'}, # also probably doesn't happen
+  _ => {$'unknown ($in.type)'}, # also probably doesn't happen
 }

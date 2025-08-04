@@ -8,6 +8,7 @@ def remove [y: int]: int -> int {
     $x
   }
 }
+
 def gcd [a: int b: int k: int = 0]: nothing -> int {
   if ($a == 0) {
     return ($b * (2 ** $k))
@@ -41,19 +42,17 @@ def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
   }
   let config = $config | open
   let modules = $config | get modules
-  let interval = (
-    $config.modules.interval
-    | where {|v| ($v | describe) == 'int' and $v > 0 }
+  let interval = $config.modules.interval
+    | where ($it | describe) == 'int' and $it > 0
     | gcd-list
-  )
   let interval_dur = $interval | into duration -u ms
   let max = $config.modules.interval | math max
 
   "{\"version\":1,\"click_events\":false}\n[" | print
 
-  if ($config.debug? != null) {
-    sleep ($config.debug.sleep? | default 1000 | into duration -u ms);
-    # ^allow notificaiton daemon time to start
+  $config.debug?.notify-sleep?
+  | if ($in != null) {
+    sleep ($in | into duration -u ms)
     notify-send 'swayblocks.nu info' ([
       $interval
       $max
@@ -67,18 +66,14 @@ def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
     let before = date now
     let result = $modules
       | reduce -f {cache: $cache results: []} {|mod acc|
-        let path = (
-          [$mod.name $mod.instance?]
-          | where {$in != null}
+        let path = [$mod.name $mod.instance?]
+          | where $it != null
           | into cell-path
-        )
         if ($clock mod $mod.interval == 0) {
-          let output = (
-            run-external ...$mod.command
+          let output = run-external ...$mod.command
             | { name: $mod.name full_text: $in }
             | if ($mod.instance? != null) {insert instance $mod.instance} else {$in}
             | if ($mod.markup? != null) {insert markup $mod.markup} else {$in}
-          )
           { # goes into accumulator
             cache: ($acc.cache | upsert $path $output)
             results: ($acc.results | append $output)
@@ -94,12 +89,14 @@ def main [--config (-c): string = '~/.config/swayblocks/config.yml'] {
       }
 
     $cache = $result.cache
+    let time = (date now) - $before
     $result.results
+    | if ($config.debug?.append-time? != null) {
+      append {name: debug-time full_text: ($time | format duration ms)}
+    } else {$in}
     | to json -r
     | $in ++ ','
     | print
-    sleep ($before - (date now) + $interval_dur)
-    # makes more sense as interval - (date now - before) but this is more
-    # conscise because order of operations
+    sleep ($interval_dur - $time)
   } }
 }

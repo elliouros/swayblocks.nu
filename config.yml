@@ -1,5 +1,6 @@
 # debug:
-#   sleep: 500
+  # notify-sleep: 500
+  # append-time: true
 modules:
   - name: focused
     command: ["/home/ellie/.config/swayblocks/focused.nu"]
