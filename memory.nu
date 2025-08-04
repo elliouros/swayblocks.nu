@@ -1,8 +1,4 @@
 #!/usr/bin/env nu
-# Because swayblocks.nu does not spawn processes in parallel and sys cpu -l is
-# unperformant, this script is really slow and will make your bar stutter.
-# It's also just full of jank and probably bad code. Seriously, don't use this.
-# (Nonetheless, it was a fun excercise ¯\_(ツ)_/¯ )
 const gradient = [
   [ 0   255 255 ] # red channel
   [ 255 255 0   ] # green channel
@@ -52,14 +48,6 @@ def color []: list<number> -> string {
   | str join
 }
 
-sys cpu -l
-| get cpu_usage
-| each {
-  $in / 100
-  | gradient $gradient
-  | color
-}
-| chunks 2
-| each {$"<span color=\"#($in.0)\" bgcolor=\"#($in.1)\">\u{258C}</span>"}
-| str join
-| '<span color="#FFFF00">CPU</span> ' ++ $in
+sys mem
+| $in.used / $in.total
+| $'<span color="#FFFF00">MEM</span> <span color="#($in | gradient $gradient | color)">($in * 100 | math round -p 1)%</span>'

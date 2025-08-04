@@ -1,6 +1,6 @@
-# debug:
+debug:
   # notify-sleep: 500
-  # append-time: true
+  append-time: true
 modules:
   - name: focused
     command: ["/home/ellie/.config/swayblocks/focused.nu"]
@@ -22,6 +22,14 @@ modules:
     command: ["/home/ellie/.config/swayblocks/backlight.nu"]
     interval: 1000
     markup: pango
+  - name: memory
+    command: ["/home/ellie/.config/swayblocks/memory.nu"]
+    interval: 1000
+    markup: pango
+  # - name: cpu
+  #   command: ["/home/ellie/.config/swayblocks/cpu.nu"]
+  #   interval: 1000
+  #   markup: pango
   - name: date
     command: ["date", "+%T"]
     # command: ["date", "+%T %Y-%m-%d"]
